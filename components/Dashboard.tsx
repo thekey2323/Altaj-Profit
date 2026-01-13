@@ -140,15 +140,25 @@ export const Dashboard: React.FC = () => {
     { name: 'Week 3', cash: 150, profit: 800 },
     { name: 'Week 4', cash: metrics.cashBalance, profit: metrics.unitEconomicsProfit },
   ];
-
+type StatCardType = 'neutral' | 'success' | 'danger' | 'warning';
   // --- RENDER HELPERS ---
-  const StatCard = ({ title, value, subtext, icon: Icon, type = 'neutral' }: any) => {
-    const colors = {
-      neutral: 'bg-white border-slate-200 text-slate-900',
-      success: 'bg-emerald-50 border-emerald-200 text-emerald-900',
-      danger: 'bg-rose-50 border-rose-200 text-rose-900',
-      warning: 'bg-amber-50 border-amber-200 text-amber-900',
-    };
+  interface StatCardProps {
+  title: string;
+  value: string | number;
+  subtext?: string;
+  icon: React.ElementType;
+  type?: StatCardType;
+}
+
+const StatCard = ({ title, value, subtext, icon: Icon, type = 'neutral' }: StatCardProps) => {
+
+    const colors: Record<StatCardType, string> = {
+  neutral: 'bg-white border-slate-200 text-slate-900',
+  success: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+  danger: 'bg-rose-50 border-rose-200 text-rose-900',
+  warning: 'bg-amber-50 border-amber-200 text-amber-900',
+};
+
 
     return (
       <div className={`p-5 rounded-xl border shadow-sm ${colors[type]}`}>
