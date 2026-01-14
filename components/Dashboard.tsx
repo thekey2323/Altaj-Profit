@@ -210,7 +210,7 @@ export const Dashboard: React.FC = () => {
     return (
       <div 
         onClick={onClick}
-        className={`p-5 rounded-xl border shadow-sm ${variants[variant]} ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]' : ''}`}
+        className={`p-5 rounded-xl border shadow-sm ${variants[variant as keyof typeof variants]} ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]' : ''}`}
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-sm font-medium opacity-80">{title}</h3>
