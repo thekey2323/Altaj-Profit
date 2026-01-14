@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-export const Dashboard: React.FC = () => {
+const Dashboard: React.FC = () => {
   const { orders, products, materials, ads, startFresh } = useApp();
   const [viewMode, setViewMode] = useState<'CASHFLOW' | 'UNIT_ECONOMICS'>('CASHFLOW');
 
@@ -321,3 +321,4 @@ const StatCard = ({ title, value, subtext, icon: Icon, type = 'neutral' }: StatC
     </div>
   );
 };
+export default Dashboard;
