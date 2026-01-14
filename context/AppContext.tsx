@@ -57,7 +57,7 @@ const INITIAL_ORDERS: Order[] = [
   { id: 'o5', customerName: 'Fatima Z.', productId: 'p1', status: OrderStatus.PENDING, date: '2023-10-15', lastUpdated: '2023-10-15', finalPrice: 350, manualShippingCost: 35 },
 ];
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
