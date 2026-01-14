@@ -1,10 +1,4 @@
-import type { Metadata } from 'next';
-import './globals.css';
-
-export const metadata: Metadata = {
-  title: 'CraftLedger Morocco',
-  description: 'Accounting tool for handmade leather businesses',
-};
+import { AppProvider } from "@/context/AppContext";
 
 export default function RootLayout({
   children,
@@ -13,8 +7,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-slate-50 text-slate-900 font-sans antialiased">
-        {children}
+      <body>
+        <AppProvider>
+          {children}
+        </AppProvider>
       </body>
     </html>
   );
