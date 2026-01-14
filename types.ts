@@ -1,11 +1,13 @@
 // Domain Models
 
 export enum OrderStatus {
-  PENDING = 'Pending',       // Order received, no action yet
-  CONFIRMED = 'Confirmed',   // Customer confirmed via phone
-  SHIPPED = 'Shipped',       // Handed to courier (Cost incurred)
-  DELIVERED = 'Delivered',   // Money received (Revenue recognized)
-  RETURNED = 'Returned',     // Failed delivery (Loss realized)
+  PENDING = 'Pending',             // Order received, no action yet
+  CONFIRMED = 'Confirmed',         // Customer confirmed via phone
+  SHIPPED = 'Shipped',             // Handed to courier
+  DELIVERED = 'Delivered',         // Cash Received
+  RETURNED_FREE = 'Returned (Free)', // Refused, no shipping fee charged (Deal with courier)
+  RETURNED_PAID = 'Returned (Paid)', // Refused, shipping fee paid
+  LOST_DAMAGED = 'Lost/Damaged',   // Total loss of product
 }
 
 export enum AdPurpose {
@@ -28,16 +30,17 @@ export interface Product {
   name: string;
   price: number;            // Selling price (e.g., 400 MAD)
   materialIds: string[];    // Linked materials
-  laborCost: number;        // Manual input
+  laborCost: number;        // Owner's time value
   packagingCost: number;
   shippingCost: number;     // Avg cost to ship
-  failBuffer: number;       // Avg loss per unit due to returns (e.g. 10 MAD)
 }
 
 export interface Order {
   id: string;
   customerName: string;
+  city: string;                // Customer City
   productId: string;
+  quantity: number;            // Number of units
   status: OrderStatus;
   date: string;
   lastUpdated: string;
@@ -52,18 +55,4 @@ export interface AdSpend {
   amount: number;
   purpose: AdPurpose;
   date: string;
-}
-
-export interface FinancialSnapshot {
-  revenue: number;
-  cogs: number;
-  shippingSpend: number;
-  adSpend: number;
-  netProfit: number;
-  cashBalance: number;
-  deliveredCount: number;
-  totalOrders: number;
-  deliveryRate: number;
-  breakEvenCPA: number;
-  avgProfitPerWallet: number;
 }

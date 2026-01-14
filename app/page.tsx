@@ -1,9 +1,9 @@
-"use client";
-
-import Dashboard from "@/components/Dashboard";
+import App from '../App';
 
 export default function Home() {
-  return <Dashboard />;
+  return (
+    <main>
+      <App />
+    </main>
+  );
 }
-
-

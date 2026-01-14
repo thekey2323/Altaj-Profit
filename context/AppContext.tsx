@@ -1,4 +1,3 @@
-"use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Material, Product, Order, AdSpend, OrderStatus, AdPurpose } from '../types';
 
@@ -8,6 +7,8 @@ interface AppContextType {
   orders: Order[];
   ads: AdSpend[];
   addMaterial: (m: Omit<Material, 'id' | 'remainingUnits'>) => void;
+  updateMaterial: (m: Material) => void;
+  deleteMaterial: (id: string) => void;
   addProduct: (p: Omit<Product, 'id'>) => void;
   updateProduct: (p: Product) => void;
   deleteProduct: (id: string) => void;
@@ -16,6 +17,8 @@ interface AppContextType {
   updateOrder: (order: Order) => void;
   deleteOrder: (id: string) => void;
   addAdSpend: (a: Omit<AdSpend, 'id'>) => void;
+  updateAdSpend: (a: AdSpend) => void;
+  deleteAdSpend: (id: string) => void;
   resetData: () => void;
   clearAllData: () => void;
   startFresh: () => void;
@@ -39,8 +42,7 @@ const INITIAL_PRODUCTS: Product[] = [
     materialIds: ['m1', 'm2'], 
     laborCost: 40, 
     packagingCost: 15, 
-    shippingCost: 35, 
-    failBuffer: 20 
+    shippingCost: 35
   }
 ];
 
@@ -50,14 +52,14 @@ const INITIAL_ADS: AdSpend[] = [
 ];
 
 const INITIAL_ORDERS: Order[] = [
-  { id: 'o1', customerName: 'Ahmed B.', productId: 'p1', status: OrderStatus.DELIVERED, date: '2023-10-12', lastUpdated: '2023-10-14', finalPrice: 350, manualShippingCost: 35 },
-  { id: 'o2', customerName: 'Sara K.', productId: 'p1', status: OrderStatus.DELIVERED, date: '2023-10-12', lastUpdated: '2023-10-14', finalPrice: 350, manualShippingCost: 35 },
-  { id: 'o3', customerName: 'Omar L.', productId: 'p1', status: OrderStatus.SHIPPED, date: '2023-10-13', lastUpdated: '2023-10-13', finalPrice: 350, manualShippingCost: 35 },
-  { id: 'o4', customerName: 'Yassine M.', productId: 'p1', status: OrderStatus.RETURNED, date: '2023-10-11', lastUpdated: '2023-10-15', finalPrice: 350, manualShippingCost: 35 },
-  { id: 'o5', customerName: 'Fatima Z.', productId: 'p1', status: OrderStatus.PENDING, date: '2023-10-15', lastUpdated: '2023-10-15', finalPrice: 350, manualShippingCost: 35 },
+  { id: 'o1', customerName: 'Ahmed B.', city: 'Casablanca', productId: 'p1', quantity: 1, status: OrderStatus.DELIVERED, date: '2023-10-12', lastUpdated: '2023-10-14', finalPrice: 350, manualShippingCost: 35 },
+  { id: 'o2', customerName: 'Sara K.', city: 'Rabat', productId: 'p1', quantity: 1, status: OrderStatus.DELIVERED, date: '2023-10-12', lastUpdated: '2023-10-14', finalPrice: 350, manualShippingCost: 35 },
+  { id: 'o3', customerName: 'Omar L.', city: 'Marrakech', productId: 'p1', quantity: 1, status: OrderStatus.SHIPPED, date: '2023-10-13', lastUpdated: '2023-10-13', finalPrice: 350, manualShippingCost: 35 },
+  { id: 'o4', customerName: 'Yassine M.', city: 'Tangier', productId: 'p1', quantity: 1, status: OrderStatus.RETURNED_PAID, date: '2023-10-11', lastUpdated: '2023-10-15', finalPrice: 350, manualShippingCost: 35 },
+  { id: 'o5', customerName: 'Fatima Z.', city: 'Fes', productId: 'p1', quantity: 2, status: OrderStatus.PENDING, date: '2023-10-15', lastUpdated: '2023-10-15', finalPrice: 700, manualShippingCost: 35 },
 ];
 
-export const AppProvider = ({ children }: { children: React.ReactNode }) => {
+export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -107,6 +109,14 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     setMaterials(prev => [...prev, newMaterial]);
   };
 
+  const updateMaterial = (updatedMaterial: Material) => {
+    setMaterials(prev => prev.map(m => m.id === updatedMaterial.id ? updatedMaterial : m));
+  };
+
+  const deleteMaterial = (id: string) => {
+    setMaterials(prev => prev.filter(m => m.id !== id));
+  };
+
   const addProduct = (p: Omit<Product, 'id'>) => {
     setProducts(prev => [...prev, { ...p, id: Math.random().toString(36).substr(2, 9) }]);
   };
@@ -147,6 +157,14 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     setAds(prev => [...prev, { ...a, id: Math.random().toString(36).substr(2, 9) }]);
   };
 
+  const updateAdSpend = (updatedAd: AdSpend) => {
+    setAds(prev => prev.map(a => a.id === updatedAd.id ? updatedAd : a));
+  };
+
+  const deleteAdSpend = (id: string) => {
+    setAds(prev => prev.filter(a => a.id !== id));
+  };
+
   const resetData = () => {
     if (window.confirm("This will reset all data to the initial demo state. Are you sure?")) {
       setMaterials(INITIAL_MATERIALS);
@@ -178,7 +196,10 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AppContext.Provider value={{
       materials, products, orders, ads,
-      addMaterial, addProduct, updateProduct, deleteProduct, addOrder, updateOrderStatus, updateOrder, deleteOrder, addAdSpend, resetData, clearAllData, startFresh
+      addMaterial, updateMaterial, deleteMaterial,
+      addProduct, updateProduct, deleteProduct, addOrder, updateOrderStatus, updateOrder, deleteOrder, 
+      addAdSpend, updateAdSpend, deleteAdSpend,
+      resetData, clearAllData, startFresh
     }}>
       {children}
     </AppContext.Provider>

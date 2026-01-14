@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Product } from '../types';
-import { Plus, Edit2, Trash2, X, Tag, Box, Truck, AlertOctagon, Hammer } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Tag, Box, Truck, Hammer, Calculator } from 'lucide-react';
 
 export const Products: React.FC = () => {
   const { products, materials, addProduct, updateProduct, deleteProduct } = useApp();
@@ -14,7 +14,6 @@ export const Products: React.FC = () => {
   const [laborCost, setLaborCost] = useState('');
   const [packagingCost, setPackagingCost] = useState('');
   const [shippingCost, setShippingCost] = useState('');
-  const [failBuffer, setFailBuffer] = useState('');
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
 
   const inputClass = "w-full p-2 bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm text-slate-900 placeholder-slate-400";
@@ -23,10 +22,9 @@ export const Products: React.FC = () => {
     setEditingId(null);
     setName('');
     setPrice('');
-    setLaborCost('0');
+    setLaborCost(''); // Reset to empty to force entry
     setPackagingCost('0');
-    setShippingCost('0');
-    setFailBuffer('0');
+    setShippingCost('35'); // Default Morocco shipping
     setSelectedMaterials([]);
     setIsModalOpen(true);
   };
@@ -38,7 +36,6 @@ export const Products: React.FC = () => {
     setLaborCost(p.laborCost.toString());
     setPackagingCost(p.packagingCost.toString());
     setShippingCost(p.shippingCost.toString());
-    setFailBuffer(p.failBuffer.toString());
     setSelectedMaterials(p.materialIds);
     setIsModalOpen(true);
   };
@@ -59,7 +56,6 @@ export const Products: React.FC = () => {
       laborCost: Number(laborCost),
       packagingCost: Number(packagingCost),
       shippingCost: Number(shippingCost),
-      failBuffer: Number(failBuffer),
       materialIds: selectedMaterials
     };
 
@@ -84,7 +80,30 @@ export const Products: React.FC = () => {
       const m = materials.find(mat => mat.id === mId);
       if (m && m.yield > 0) matCost += m.cost / m.yield;
     });
-    return matCost + p.laborCost + p.packagingCost + p.shippingCost + p.failBuffer;
+    return matCost + p.laborCost + p.packagingCost + p.shippingCost;
+  };
+
+  // Profit Simulation Helper
+  const simulateProfit = (product: Product, returnRate: number) => {
+    const cost = calculateTotalCost(product);
+    // 100 orders simulation
+    const successful = 100 * (1 - returnRate);
+    const returns = 100 * returnRate; // Assuming 50% paid returns, 50% free returns for simplicity in quick view
+    
+    // Revenue
+    const revenue = successful * product.price;
+    
+    // Costs
+    // Delivered: Full Cost
+    const deliveredCost = successful * cost;
+    
+    // Returns (Simplified Model for card view: Avg loss per return is Shipping + Packing)
+    // Assuming 50% of returns are PAID shipping (loss ~40dh) and 50% FREE (loss ~5dh pack)
+    const avgReturnLoss = (product.shippingCost + product.packagingCost + product.packagingCost) / 2;
+    const returnCost = returns * avgReturnLoss;
+
+    const netProfit = revenue - deliveredCost - returnCost;
+    return netProfit / 100; // Profit per Unit attempted
   };
 
   return (
@@ -103,50 +122,63 @@ export const Products: React.FC = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map(product => {
           const totalCost = calculateTotalCost(product);
-          const profit = product.price - totalCost;
-          const margin = (profit / product.price) * 100;
+          const maxProfit = product.price - totalCost;
 
           return (
-            <div key={product.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition">
+            <div key={product.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="font-bold text-lg text-slate-800">{product.name}</h3>
-                  <div className="text-indigo-600 font-bold">{product.price} MAD</div>
+                  <div className="text-indigo-600 font-bold text-xl">{product.price} MAD</div>
                 </div>
-                <div className="flex gap-1">
-                    <button 
-                      type="button"
-                      onClick={() => handleOpenEdit(product)}
-                      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
-                      title="Edit Product"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                </div>
+                <button 
+                  type="button"
+                  onClick={() => handleOpenEdit(product)}
+                  className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
               </div>
 
-              <div className="space-y-2 text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg">
+              <div className="space-y-2 text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
                 <div className="flex justify-between">
-                  <span>Total Unit Cost:</span>
-                  <span className="font-medium text-rose-700">{totalCost.toFixed(0)} MAD</span>
+                  <span>Base Unit Cost:</span>
+                  <span className="font-medium text-slate-900">{totalCost.toFixed(0)} MAD</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500">
+                   <span>(Mat+Labor+Pack+Ship)</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-200">
-                  <span>Gross Profit:</span>
-                  <span className="font-bold text-emerald-600">{profit.toFixed(0)} MAD ({margin.toFixed(0)}%)</span>
+                  <span>Max Profit (0% Returns):</span>
+                  <span className="font-bold text-emerald-600">{maxProfit.toFixed(0)} MAD</span>
                 </div>
               </div>
 
-              <div className="text-xs text-slate-400 flex flex-wrap gap-2">
-                 <span className="flex items-center gap-1"><Hammer className="w-3 h-3" /> {product.laborCost}</span>
-                 <span className="flex items-center gap-1"><Box className="w-3 h-3" /> {product.packagingCost}</span>
-                 <span className="flex items-center gap-1"><Truck className="w-3 h-3" /> {product.shippingCost}</span>
+              <div className="mt-auto">
+                 <div className="text-[10px] uppercase font-bold text-slate-400 mb-2 flex items-center gap-1">
+                    <Calculator className="w-3 h-3" /> Profitability Simulator
+                 </div>
+                 <div className="grid grid-cols-3 gap-1 text-center text-xs">
+                    <div className="bg-emerald-50 p-1 rounded border border-emerald-100">
+                        <div className="text-emerald-800 font-bold">{simulateProfit(product, 0.1).toFixed(0)}</div>
+                        <div className="text-[10px] text-emerald-600">@10% Ret</div>
+                    </div>
+                    <div className="bg-amber-50 p-1 rounded border border-amber-100">
+                        <div className="text-amber-800 font-bold">{simulateProfit(product, 0.3).toFixed(0)}</div>
+                        <div className="text-[10px] text-amber-600">@30% Ret</div>
+                    </div>
+                    <div className="bg-rose-50 p-1 rounded border border-rose-100">
+                        <div className="text-rose-800 font-bold">{simulateProfit(product, 0.5).toFixed(0)}</div>
+                        <div className="text-[10px] text-rose-600">@50% Ret</div>
+                    </div>
+                 </div>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Modal - Z-Index increased to 100, Added max height and scroll */}
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl animate-in fade-in zoom-in-95 duration-200 my-8 max-h-[90vh] overflow-y-auto">
@@ -196,13 +228,16 @@ export const Products: React.FC = () => {
 
                 <div className="space-y-4">
                   <h4 className="font-medium text-slate-900 flex items-center gap-2">
-                    <AlertOctagon className="w-4 h-4" /> Cost Structure (Per Unit)
+                    <Truck className="w-4 h-4" /> Cost Structure (Per Unit)
                   </h4>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Labor (Time Value)</label>
+                    <input required type="number" value={laborCost} onChange={e => setLaborCost(e.target.value)} className={inputClass} placeholder="e.g. 50" />
+                    <p className="text-[10px] text-slate-500 mt-1">Must be counted even if done by you.</p>
+                  </div>
+                  
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1">Labor Cost</label>
-                      <input required type="number" value={laborCost} onChange={e => setLaborCost(e.target.value)} className={inputClass} />
-                    </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-500 mb-1">Packaging</label>
                       <input required type="number" value={packagingCost} onChange={e => setPackagingCost(e.target.value)} className={inputClass} />
@@ -211,13 +246,9 @@ export const Products: React.FC = () => {
                       <label className="block text-xs font-medium text-slate-500 mb-1">Avg Shipping</label>
                       <input required type="number" value={shippingCost} onChange={e => setShippingCost(e.target.value)} className={inputClass} />
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-500 mb-1">Return Buffer</label>
-                      <input required type="number" value={failBuffer} onChange={e => setFailBuffer(e.target.value)} className={inputClass} title="Avg loss per unit due to returns" />
-                    </div>
                   </div>
-                  <div className="bg-slate-50 p-3 rounded text-xs text-slate-500 mt-2">
-                    <p>Enter average costs per single wallet. "Return Buffer" adds a safety margin for failed deliveries.</p>
+                  <div className="bg-indigo-50 p-3 rounded text-xs text-indigo-800 mt-2">
+                    <p>Shipping is tracked per order. This value is used for profit projections.</p>
                   </div>
                 </div>
               </div>
