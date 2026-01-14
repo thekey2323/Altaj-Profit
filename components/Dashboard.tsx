@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { OrderStatus, AdPurpose, Product, Material } from '../types';
