@@ -15,6 +15,13 @@ import {
   X
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+type VariantType =
+  | 'neutral'
+  | 'success'
+  | 'danger'
+  | 'warning'
+  | 'info'
+  | 'gray';
 
 export const Dashboard: React.FC = () => {
   const { orders, products, materials, ads, startFresh } = useApp();
