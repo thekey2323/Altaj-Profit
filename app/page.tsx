@@ -1,8 +1,7 @@
-
 export default function Home() {
   return (
     <main>
-      <App />
+      <h1>Hello Next.js</h1>
     </main>
   );
 }
