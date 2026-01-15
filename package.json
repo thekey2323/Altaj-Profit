@@ -27,3 +27,7 @@
     "typescript": "^5.3.0"
   }
 }
+"devDependencies": {
+  "vite": "...",
+  "@vitejs/plugin-react": "..."
+}
