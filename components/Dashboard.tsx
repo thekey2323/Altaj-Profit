@@ -15,6 +15,16 @@ import {
   X
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+<<<<<<< HEAD
+=======
+type VariantType =
+  | 'neutral'
+  | 'success'
+  | 'danger'
+  | 'warning'
+  | 'info'
+  | 'gray';
+>>>>>>> e20c50b49a9910b44c456fc6ca640640bcf22faf
 
 export const Dashboard: React.FC = () => {
   const { orders, products, materials, ads, startFresh } = useApp();
@@ -203,7 +213,11 @@ export const Dashboard: React.FC = () => {
     return (
       <div 
         onClick={onClick}
+<<<<<<< HEAD
         className={`p-5 rounded-xl border shadow-sm ${variants[variant]} ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]' : ''}`}
+=======
+        className={`p-5 rounded-xl border shadow-sm ${variants[variant as keyof typeof variants]} ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]' : ''}`}
+>>>>>>> e20c50b49a9910b44c456fc6ca640640bcf22faf
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-sm font-medium opacity-80">{title}</h3>
@@ -426,4 +440,8 @@ export const Dashboard: React.FC = () => {
       )}
     </div>
   );
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> e20c50b49a9910b44c456fc6ca640640bcf22faf
