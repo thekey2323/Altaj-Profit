@@ -82,6 +82,12 @@ export const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Business Pulse</h1>
+        {/* Coach Insight */}
+<div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+  💡 <strong>Cash Notice:</strong> Your cash flow is negative, but your business is healthy.
+  Your money is currently sitting in inventory.
+</div>
+
         <button
           onClick={startFresh}
           className="px-3 py-2 text-sm border rounded-lg"
