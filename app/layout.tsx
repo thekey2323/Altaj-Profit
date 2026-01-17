@@ -14,16 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-slate-50 text-slate-900 font-sans antialiased">
-        <div className="flex min-h-screen">
-          
-          
-
-          {/* Main content */}
-          <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
-            {children}
-          </main>
-
-        </div>
+        <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto w-full">
+          {children}
+        </main>
       </body>
     </html>
   );
