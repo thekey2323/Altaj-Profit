@@ -96,6 +96,20 @@ export const Dashboard: React.FC = () => {
           Reset
         </button>
       </div>
+{/* Secondary KPIs */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+  <StatCard
+    title="Ad Spend (Scaling)"
+    value={`${metrics.cpa?.toFixed(0) ?? 0} MAD`}
+    subtext="Average cost per order"
+  />
+
+  <StatCard
+    title="Delivery Rate"
+    value={`${metrics.deliveryRate}%`}
+    subtext={`Break-even: ${metrics.breakEvenDeliveryRate?.toFixed(0) ?? 0}%`}
+  />
+</div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard title="Revenue" value={`${metrics.revenue.toFixed(0)} MAD`} />
